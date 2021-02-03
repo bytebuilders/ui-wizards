@@ -24,9 +24,10 @@ steps:
           type: select
           schema:
             "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/version
+          disabled: true,
         - isArray: true
           schema:
-            "$ref": schema#/properties/spec/properties/labels
+            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/labels
           keys:
             label:
               text: labels.labels.key
@@ -38,10 +39,10 @@ steps:
               text: labels.labels.value
             type: input
             schema:
-              "$ref": schema#/properties/spec/properties/labels/additionalProperties
+              "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/labels/additionalProperties
         - isArray: true
           schema:
-            "$ref": schema#/properties/spec/properties/annotations
+            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/annotations
           keys:
             label:
               text: labels.annotations.key
@@ -53,7 +54,7 @@ steps:
               text: labels.annotations.value
             type: input
             schema:
-              "$ref": schema#/properties/spec/properties/annotations/additionalProperties
+              "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/annotations/additionalProperties
       type: single-step-form
     id: basic
     title: "steps.0.label"
