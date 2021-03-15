@@ -1,3 +1,9 @@
+function showAuthPasswordField({ model, getValue, watchDependency }) {
+  const modelPathValue = getValue(model, "/spec/authSecret/create");
+  watchDependency("model#/spec/authSecret/create");
+  return modelPathValue;
+}
+
 function isEqualToModelPathValue(
   { model, getValue, watchDependency },
   value,
@@ -8,14 +14,15 @@ function isEqualToModelPathValue(
   return modelPathValue === value;
 }
 
-function showAuthPasswordField({ model, getValue, watchDependency }) {
-  const modelPathValue = getValue(model, "/spec/authSecret/create");
-  watchDependency("model#/spec/authSecret/create");
-  return modelPathValue;
-}
-
 function showAuthSecretField({ model, getValue, watchDependency }) {
   return !this.showAuthPasswordField({ model, getValue, watchDependency });
+}
+
+function showStorageSizeField({ model, getValue, watchDependency }) {
+  const modelPathValue = getValue(model, "/spec/mode");
+  watchDependency("model#/spec/mode");
+  const validType = ["Standalone", "Replicaset"];
+  return validType.includes(modelPathValue);
 }
 
 async function getResources({ axios, storeGet }, group, version, resource) {
@@ -91,8 +98,8 @@ async function getSecrets({
 }) {
   const owner = storeGet("/user/username");
   const cluster = storeGet("/clusterInfo/name");
-  const namespace = getValue(model, "/namespace");
-  watchDependency("model#/namespace");
+  const namespace = getValue(model, "/metadata/release/namespace");
+  watchDependency("model#/metadata/release/namespace");
 
   const resp = await axios.get(
     `/clusters/${owner}/${cluster}/proxy/core/v1/namespaces/${namespace}/secrets`,
@@ -154,9 +161,15 @@ async function hasNoExistingSecret({
 }
 
 return {
-  isEqualToModelPathValue,
   showAuthPasswordField,
+  isEqualToModelPathValue,
   showAuthSecretField,
+  showStorageSizeField,
+  getResources,
+  getMongoDbVersions,
+  getSecrets,
+  hasExistingSecret,
+  hasNoExistingSecret,
   getResources,
   getMongoDbVersions,
   getSecrets,

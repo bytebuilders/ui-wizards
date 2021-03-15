@@ -6,6 +6,9 @@ en:
         namespace: Namespace
     spec:
       annotations: Annotations
+      authSecret:
+        name: Name
+        password: Password
       configOptions: Configuration Options
       database:
         mode: Database Mode
@@ -15,128 +18,333 @@ en:
       replicaset:
         name: Replica Set Name
         number: Replica number
-      storage:
-        size: Storage Size
-        class: Storage Class Name
       shards:
         nodes: Shard Nodes
         number: Shards Number
+      storage:
+        class: Storage Class Name
+        size: Storage Size
       terminalPolicy: Terminal Policy
-      authSecret:
-        name: Name
-        password: Password
   labels:
+    agent: Select a Monitoring Method
+    alias: Alias
     annotations:
       key: Key
-      value: Value
       label: Annotations
+      value: Value
+    api_group: API Group
+    args: Args
+    backup:
+      title: Schedule a Backup?
+      invoker: Backup Invoker
+    backupConfiguration:
+      title: Backup Configuration
+      targetReference:
+        title: Target Reference
+        type: Reference Type
+        name: Reference Name
+        apiVersion: Target ApiVersion
+        kind: Target Kind
+      taskName: Task Name
+      retentionPolicy:
+        title: Retention Policy
+        name: Name
+        keepLast: Keep Last
+        prune: Prune
+      schedule: Schedule
+    backupBlueprint:
+      title: Backup Blueprint
+      name: Blueprint Name
+      schedule: Schedule
+      taskParameters: Task Parameters
     basic_info: Basic Information
-    configServer: Config Server
+    certificate: Certificate
+    certificates: Certificates
+    cluster_ip: Cluster IP
     configOptions: Configuration Options
+    configServer: Config Server
+    config_map_key: ConfigMap Key
+    config_map_name: ConfigMap Name
+    configuration_files: Configuration Files
+    configuration_source: Configuration Source
+    controller_annotations: Controller Annotations
+    countries: Countries
+    country: Country
+    cpu: CPU
+    customize_exporter: Customize Exporter Sidecar
     database:
-      name: Database Name
-      version: Database Version
       mode: Database Mode
+      name: Database Name
       secret: Database Secret
+      version: Database Version
+    dataSource: Data Source
+    environmentVariablesFrom: Environemt Variables From
+    initialization: Pre-populate your MongoDB from backup/another database
+    waitForInitialRestore: Wait For Initial Restore?
+    dns_name: DNS Name
+    dns_names: DNS Names
+    duration: Duration
+    effect: Effect
+    enable_monitoring: Enable Monitoring
+    enable_tls: Enable TLS
+    endpoint: Endpoint
+    endpoints: Endpoints
+    environment_variable: Environment Variable
+    environment_variables: Environment Variables
+    exporter_configuration: Exporter Configuration
+    external_ip: External IP
+    external_ips: External IPs
+    external_traffic_policy: External Traffic Policy
+    fs_group: Fs Group
+    health_check_node_port: Health Check Node Port
+    honor_labels: Honor labels
+    image_pull_secrets: Image Pull Secrets
+    interval: Interval
+    ip_address: IP Address
+    ip_addresses: IP Addresses
+    issuer_ref: Issuer Reference
+    key: Key
+    kind: Kind
     labels:
       key: Key
-      value: Value
       label: Labels
+      value: Value
+    level: Level
+    limit: Limit
+    load_balancer_ip: Load Balancer IP
+    load_balancer_source_range: Load Balancer Source Range
+    load_balancer_source_ranges: Load Balancer Source Ranges
+    match_expression: Match Expression
+    match_expressions: Match Expressions
+    match_field: Match Field
+    match_fields: Match Fields
+    memory: Memory
+    mongos: Mongos
+    name: Name
     namespace: Namespace
+    new_secret_password: New Database Secret
+    node_port: Node Port
+    node_selector: Node Selector
+    node_selector_terms: Node Selector Terms
+    operator: Operator
+    organization: Organization
+    organizational_unit: Organizational Unit
+    organizational_units: Organizational Units
+    organizations: Organizations
     password: Password (Keep it empty to autogenerate)
+    path: Path
+    pod_annotations: Pod Annotations
+    pod_spec: Pod Spec
+    pod_template: Pod Template
+    port: Port
+    ports: Ports
+    preferred_during_scheduling_ignored_during_execution: Preferred During Scheduling Ignored During Execution
+    prePopulateDatabase: Do you want to pre-populate your database?
+    prometheus: Prometheus
+    province: Province
+    provinces: Provinces
+    renew_before: Renew Before
     replicaset:
       name: Replicaset Name
       number: Replica Number
+    repositories:
+      title: Repository
+      choise: ''
+      name: Name
+      backend:
+        title: Backend
+        type: Type
+        container: Container
+        prefix: Prefix
+        maxConnections: Maximum Connections
+        bucket: Bucket
+        url: URL
+        endPoint: End Point
+        region: Region
+        secret: Storage Secret
+        volumeSource: Select Volume Source
+        server: Server
+        path: Path
+        pvcName: Claim Name
+        mountPath: Mount Path
+        subPath: Sub Path
+    restoreSession:
+      title: Restore Session
+      name: Name
+      snapshot: Snapshot
+    runtimeSettings:
+      choise: Customize Restore Job Runtime Settings?
+      pod:
+        title: Pod Runtime Settings
+        serviceAccountName: Service Account Name
+        imagePullSecrets: Image Pull Secrets
+      container:
+        title: Container Runtime Settings
+        resources:
+          title: Resources
+          requests: Requests
+          limits: Limits
+          cpu: CPU
+          memory: Memory
+        nice:
+          title: Nice
+          adjustment: Adjustment
+        ionice:
+          title: Ionice
+          class: Class
+          classData: Class Data
+      securityContext:
+        title: Security Context
+        privileged: Privileged
+        fsGroup: FS Group
+        runAsUser: Run As User
+        runAsGroup: Run As Group
+        runAsNonRoot: Run As Non Root
+        seLinuxOptions:
+          title: SE Linux Options
+          level: LeveL
+          role: Role
+          type: Type
+          user: User
+    script:
+      path: Script Path
+      volume: Source Volume
+      volumeType: Type
+      volumeName: Name
+    request: Request
+    resources: Resources
+    role: Role
+    run_as_group: Run as Group
+    run_as_non_root: Run As Non Root?
+    run_as_user: Run as User
+    scrapping_interval: Scrapping Interval
+    se_linux_options: SE Linux Options
     secret: Secret
+    secret_key: Secret Key
+    secret_name: Secret Name
+    security_context: Security Context
+    service_account_name: Service Account Name
+    service_monitor: Service Monitor
+    service_monitor_configuration: ServiceMonitor Configuration
+    service_template: Service Template
+    service_template_annotations: Service Template Annotations
+    service_templates: Service Templates
     shardNodes: Shard Nodes
     shards: Shards
-    mongos: Mongos
     storage:
-      size: Storage Size
       class: Storage Class
-    terminalPolicy: Terminal Policy
-    issuer_ref: Issuer Reference
-    api_group: API Group
-    kind: Kind
-    name: Name
-    certificates: Certificates
-    certificate: Certificate
-    alias: Alias
-    secret_name: Secret Name
-    duration: Duration
-    renew_before: Renew Before
+      size: Storage Size
     subject: Subject
-    organizations: Organizations
-    countries: Countries
-    organizational_units: Organizational Units
-    provinces: Provinces
-    dns_names: DNS Names
-    ip_addresses: IP Addresses
-    organization: Organization
-    country: Country
-    organizational_unit: Organizational Unit
-    province: Province
-    dns_name: DNS Name
-    ip_address: IP Address
+    terminalPolicy: Terminal Policy
+    timeout_seconds: Timeout Seconds
+    toleration: Toleration
+    toleration_seconds: Toleration in seconds
+    tolerations: Tolerations
+    type: Type
+    user: User
+    value: Value
+    values: Values
+    weight: Weight
+  options:
+    agent:
+      prometheus:
+        description: Only injects the metric exporter sidecar
+        label: Use Custom Scrapper
+      prometheus_builtin:
+        description: Inject metric exporter sidecar and add Prometheus annotations to the stats Service
+        label: Manually Deployed Prometheus Scrapper
+      prometheus_operator:
+        description: Inject metric exporter sidecar and creates a ServiceMonitor
+        label: Prometheus Operator
+    configOptions:
+      backup:
+        description: Schedule periodic backup via Stash.
+        label: Backup
+      customConfig:
+        description: Configure MongoDB with configuration files.
+        label: Custom Config
+      initialization:
+        description: Initialize database from backup or script.
+        label: Initialization
+      monitoring:
+        description: Setup Prometheus monitoring for the database.
+        label: Monitoring
+      networking:
+        description: Customize Services for the database.
+        label: Networking
+      podTemplate:
+        description: Customize runtime options for the database pods.
+        label: Pod Template
+      tls:
+        description: Secure database with TLS.
+        label: TLS
+      topology:
+        description: Configure your cluster topology.
+        label: Topology
+    configuration_source:
+      create_new_config:
+        label: Create New Config
+      use_existing_config:
+        label: Use Existing Config
+    createOrSelect:
+      create:
+        text: Create New
+      select:
+        text: Use Existing
+    database:
+      mode:
+        Replicaset:
+          description: MongoDB ReplicaSet for high availability.
+          label: Replicated Cluster
+        Sharded:
+          description: MongoDB sharded cluster for high performance and high availability.
+          label: Sharded Cluster
+        Standalone:
+          description: Single node MongoDB without high availability and sharding.
+          label: Standalone
+      secret:
+        customSecret:
+          label: New Secret
+        existingSecret:
+          label: Use Existing Secret
+    dataSource:
+      script:
+        text: Script
+      stashBackup:
+        text: Stash Backup
+    scriptSourceVolumeType:
+      configMap:
+        text: ConfigMap
+      secret:
+        text: Secret
+    storageClass:
+      standard:
+        label: Standard
+    terminationPolicy:
+      delete:
+        description: Keep only database Secrets and backed up data.
+        label: Delete
+      doNotTerminate:
+        description: Prevent deletion of the MongoDB CRD.
+        label: DoNotTerminate
+      halt:
+        description: 'Keep PVCs, database Secrets and backed up data.'
+        label: Halt
+      wipeOut:
+        description: Delete everything including backed up data.
+        label: WipeOut
+    yesOrNo:
+      'yes':
+        text: 'Yes'
+      'no':
+        text: 'No'
   steps:
     - label: Basic Information
     - label: Topology
     - label: TLS Configuration
-  options:
-    database:
-      secret:
-        existingSecret:
-          label: Use Existing Secret
-        customSecret:
-          label: New Secret
-      mode:
-        Standalone:
-          label: Standalone
-          description: Single node MongoDB without high availability and sharding.
-        Replicaset:
-          label: Replicated Cluster
-          description: MongoDB ReplicaSet for high availability.
-        Sharded:
-          label: Sharded Cluster
-          description: MongoDB sharded cluster for high performance and high availability.
-    configOptions:
-      topology:
-        label: Topology
-        description: Configure your cluster topology.
-      tls:
-        label: TLS
-        description: Secure database with TLS.
-      initialization:
-        label: Initialization
-        description: Initialize database from backup or script.
-      backup:
-        label: Backup
-        description: Schedule periodic backup via Stash.
-      networking:
-        label: Networking
-        description: Customize Services for the database.
-      monitoring:
-        label: Monitoring
-        description: Setup Prometheus monitoring for the database.
-      customConfig:
-        label: Custom Config
-        description: Configure MongoDB with configuration files.
-      podTemplate:
-        label: Pod Template
-        description: Customize runtime options for the database pods.
-    storageClass:
-      standard:
-        label: Standard
-    terminalPolicy:
-      delete:
-        label: Delete
-        description: Keep only database Secrets and backed up data.
-      halt:
-        label: Halt
-        description: Keep PVCs, database Secrets and backed up data.
-      wipeOut:
-        label: WipeOut
-        description: Delete everything including backed up data.
-      doNotTerminate:
-        label: DoNotTerminate
-        description: Prevent deletion of the MongoDB CRD.
+    - label: Initialization
+    - label: Backup
+    - label: Monitoring
+    - label: Pod Template
+    - label: Networking
+    - label: Custom Config

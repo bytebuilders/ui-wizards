@@ -21,7 +21,7 @@ en:
       shards:
         nodes: Shard Nodes
         number: Shards Number
-      terminalPolicy: Terminal Policy
+      terminationPolicy: Termination Policy
       authSecret:
         name: Name
         password: Password
@@ -56,7 +56,7 @@ en:
     storage:
       size: Storage Size
       class: Storage Class
-    terminalPolicy: Terminal Policy
+    terminationPolicy: Termination Policy
   options:
     configOptions:
       topology:
@@ -102,13 +102,13 @@ en:
     storageClass:
       standard:
         label: Standard
-    terminalPolicy:
+    terminationPolicy:
       delete:
         label: Delete
         description: Keep only database Secrets and backed up data.
       halt:
         label: Halt
-        description: Keep PVCs, database Secrets and backed up data.
+        description: 'Keep PVCs, database Secrets and backed up data.'
       wipeOut:
         label: WipeOut
         description: Delete everything including backed up data.

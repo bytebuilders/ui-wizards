@@ -9,22 +9,22 @@ steps:
             text: labels.database.name
           type: input
           schema:
-            "$ref": schema#/properties/metadata/properties/release/properties/name
+            $ref: 'schema#/properties/metadata/properties/release/properties/name'
         - label:
             text: labels.namespace
           fetch: getResources|core|v1|namespaces
           type: select
           schema:
-            "$ref": schema#/properties/metadata/properties/release/properties/namespace
+            $ref: 'schema#/properties/metadata/properties/release/properties/namespace'
         - label:
             text: labels.database.version
           fetch: getMongoDbVersions|catalog.kubedb.com|v1alpha1|mongodbversions
           type: select
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/version
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/version'
         - isArray: true
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/labels
+            $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/labels'
           keys:
             label:
               text: labels.labels.key
@@ -36,10 +36,10 @@ steps:
               text: labels.labels.value
             type: input
             schema:
-              "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/labels/additionalProperties
+              $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/labels/additionalProperties'
         - isArray: true
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/annotations
+            $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/annotations'
           keys:
             label:
               text: labels.annotations.key
@@ -51,32 +51,66 @@ steps:
               text: labels.annotations.value
             type: input
             schema:
-              "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/metadata/properties/annotations/additionalProperties
+              $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/annotations/additionalProperties'
         - label:
-            text: labels.terminalPolicy
+            text: labels.terminationPolicy
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/terminationPolicy
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/terminationPolicy'
           type: radio
           hasDescription: true
           options:
             - value: Delete
-              text: options.terminalPolicy.delete.label
-              description: options.terminalPolicy.delete.description
+              text: options.terminationPolicy.delete.label
+              description: options.terminationPolicy.delete.description
             - value: Halt
-              text: options.terminalPolicy.halt.label
-              description: options.terminalPolicy.halt.description
+              text: options.terminationPolicy.halt.label
+              description: options.terminationPolicy.halt.description
             - value: WipeOut
-              text: options.terminalPolicy.wipeOut.label
-              description: options.terminalPolicy.wipeOut.description
+              text: options.terminationPolicy.wipeOut.label
+              description: options.terminationPolicy.wipeOut.description
             - value: DoNotTerminate
-              text: options.terminalPolicy.doNotTerminate.label
-              description: options.terminalPolicy.doNotTerminate.description
-        - disabled: true
+              text: options.terminationPolicy.doNotTerminate.label
+              description: options.terminationPolicy.doNotTerminate.description
+        - if: showAuthSecretField
+          elements:
+            - label:
+                text: labels.database.secret
+                hasLine: true
+              type: label-element
+            - if: hasExistingSecret
+              label:
+                text: labels.secret
+              fetch: getSecrets
+              type: select
+              schema:
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/authSecret/properties/name'
+            - if: hasNoExistingSecret
+              label:
+                text: labels.secret
+              type: input
+              schema:
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/authSecret/properties/name'
+        - if: showAuthPasswordField
           label:
             text: labels.database.secret
           type: input
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/authSecret/properties/name
+            $ref: 'schema#/properties/resources/properties/secretAuth/properties/metadata/properties/name'
+        - if: showNewSecretCreateField
+          type: single-step-form
+          schema:
+            $ref: 'schema#/properties/resources/properties/secretAuth/properties/data'
+          elements:
+            - label:
+                text: labels.new_secret_password
+                hasLine: true
+              type: label-element
+            - if: showNewSecretCreateField
+              label:
+                text: labels.password
+              type: input
+              schema:
+                $ref: 'schema#/properties/resources/properties/secretAuth/properties/data/properties/password'
       type: single-step-form
     id: basic
     title: steps.0.label
@@ -88,7 +122,7 @@ steps:
           onChange: deleteDatabaseModePath
           type: radio
           schema:
-            "$ref": discriminator#/activeDatabaseMode
+            $ref: 'discriminator#/activeDatabaseMode'
           hasDescription: true
           options:
             - value: Standalone
@@ -106,30 +140,24 @@ steps:
                 text: labels.replicaset.name
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/replicaSet/properties/name
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/replicaSet/properties/name'
             - label:
                 text: labels.replicaset.number
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/replicas
-        - if: isEqualToDatabaseMode|Standalone
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/replicas'
+        - if: showStorageSizeField
           label:
             text: labels.storage.size
           type: input
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/storage/properties/resources/properties/requests/properties/storage
-        - if: isEqualToDatabaseMode|Replicaset
-          label:
-            text: labels.storage.size
-          type: input
-          schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/storage/properties/resources/properties/requests/properties/storage
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/storage/properties/resources/properties/requests/properties/storage'
         - label:
             text: labels.storage.class
           fetch: getResources|storage.k8s.io|v1|storageclasses
           type: select
           schema:
-            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/storage/properties/storageClassName
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/storage/properties/storageClassName'
         - if: isEqualToDatabaseMode|Sharded
           elements:
             - label:
@@ -140,12 +168,12 @@ steps:
                 text: labels.shards
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/shard/properties/shards
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/shard/properties/shards'
             - label:
                 text: labels.storage.size
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/shard/properties/storage/properties/resources/properties/requests/properties/storage
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/shard/properties/storage/properties/resources/properties/requests/properties/storage'
             - label:
                 text: labels.configServer
                 hasLine: true
@@ -154,7 +182,7 @@ steps:
                 text: labels.storage.size
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/configServer/properties/storage/properties/resources/properties/requests/properties/storage
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/configServer/properties/storage/properties/resources/properties/requests/properties/storage'
             - label:
                 text: labels.mongos
                 hasLine: true
@@ -163,7 +191,7 @@ steps:
                 text: labels.replicaset.number
               type: input
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/mongos/properties/replicas
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/shardTopology/properties/mongos/properties/replicas'
       discriminator:
         activeDatabaseMode:
           type: string
@@ -175,40 +203,57 @@ steps:
       elements:
         - type: switch
           label:
-            text: Configure TLS
+            text: labels.enable_tls
           schema:
-            "$ref": discriminator#/configureTLS
+            $ref: 'discriminator#/configureTLS'
+          computed: isValueExistInModel|/resources/kubedbComMongoDB/spec/tls
           onChange: onTlsConfigureChange
         - if: showTlsConfigureSection
           type: single-step-form
-          label:
-            text: TLS configure element
           elements:
             - label:
                 text: labels.issuer_ref
               type: label-element
-              customClass: mb-0
-            - label:
-                text: labels.api_group
-              type: input
+            - type: single-step-form
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/apiGroup
-            - label:
-                text: labels.kind
-              type: input
-              schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/kind
-            - label:
-                text: labels.name
-              type: input
-              schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/name
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef'
+              elements:
+                - label:
+                    text: labels.api_group
+                  disabled: true
+                  computed: setApiGroup
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/apiGroup'
+                - label:
+                    text: labels.kind
+                  options:
+                    - text: Issuer
+                      value: Issuer
+                    - text: ClusterIssuer
+                      value: ClusterIssuer
+                  type: select
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/kind'
+                - if: hasIssuerRefName
+                  label:
+                    text: labels.name
+                  fetch: getIssuerRefsName
+                  type: select
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/name'
+                - if: hasNoIssuerRefName
+                  label:
+                    text: labels.name
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/issuerRef/properties/name'
             - type: single-step-form-array
               label:
                 text: labels.certificates
               addFormLabel: labels.certificate
               schema:
-                "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates'
               tableContents:
                 - type: value
                   typeOfValue: string
@@ -282,100 +327,100 @@ steps:
                       text: labels.alias
                     type: input
                     schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/alias
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/alias'
                   - label:
                       text: labels.secret_name
                     type: input
                     schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/secretName
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/secretName'
                   - label:
                       text: labels.duration
                     type: input
                     schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/duration
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/duration'
                   - label:
                       text: labels.renew_before
                     type: input
                     schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/renewBefore
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/renewBefore'
                   - label:
                       text: labels.subject
                       hasLine: true
                     type: label-element
                     customClass: mb-15
                   - schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject'
                     type: single-step-form
                     elements:
                       - schema:
-                          "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizations
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizations'
                         type: list-input-form
                         element:
                           label:
                             text: labels.organization
                           schema:
-                            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizations/items
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizations/items'
                           type: input
                         label:
                           text: labels.organizations
                           isSubsection: true
                       - schema:
-                          "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/countries
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/countries'
                         type: list-input-form
                         element:
                           label:
                             text: labels.country
                           schema:
-                            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/countries/items
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/countries/items'
                           type: input
                         label:
                           text: labels.countries
                           isSubsection: true
                       - schema:
-                          "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizationalUnits
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizationalUnits'
                         type: list-input-form
                         element:
                           label:
                             text: labels.organizational_unit
                           schema:
-                            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizationalUnits/items
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/organizationalUnits/items'
                           type: input
                         label:
                           text: labels.organizational_units
                           isSubsection: true
                       - schema:
-                          "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/provinces
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/provinces'
                         type: list-input-form
                         element:
                           label:
                             text: labels.province
                           schema:
-                            "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/provinces/items
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/subject/properties/provinces/items'
                           type: input
                         label:
                           text: labels.provinces
                           isSubsection: true
                   - schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/dnsNames
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/dnsNames'
                     hasLineLabel: true
                     type: list-input-form
                     element:
                       label:
                         text: labels.dns_name
                       schema:
-                        "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/dnsNames/items
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/dnsNames/items'
                       type: input
                     label:
                       text: labels.dns_names
                       hasLine: true
                   - schema:
-                      "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/ipAddresses
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/ipAddresses'
                     type: list-input-form
                     element:
                       label:
                         text: labels.ip_address
                       schema:
-                        "$ref": schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/ipAddresses/items
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/tls/properties/certificates/items/properties/ipAddresses/items'
                       type: input
                     label:
                       text: labels.ip_addresses
@@ -384,9 +429,2585 @@ steps:
       discriminator:
         configureTLS:
           type: boolean
-          default: false
+          default: true
       type: single-step-form
     id: tls
     title: steps.2.label
+  - form:
+      type: single-step-form
+      discriminator:
+        scheduleBackup:
+          type: boolean
+      elements:
+        - type: radio
+          label:
+            text: labels.backup.title
+          schema:
+            $ref: 'discriminator#/properties/scheduleBackup'
+          options:
+            - text: options.yesOrNo.yes.text
+              value: 'yes'
+            - text: options.yesOrNo.no.text
+              value: 'no'
+          computed: initScheduleBackup
+          onChange: onScheduleBackupChange
+        - type: single-step-form
+          label:
+            text: Backup Form
+          if: showBackupForm
+          discriminator:
+            backupInvoker:
+              type: string
+          elements:
+            - type: select
+              label:
+                text: labels.backup.invoker
+              schema:
+                $ref: 'discriminator#/properties/backupInvoker'
+              options:
+                - text: Backup Configuration
+                  value: backupConfiguration
+                - text: Backup Blueprint
+                  value: backupBlueprint
+              computed: initBackupInvoker
+              onChange: onBackupInvokerChange
+            - if: showInvokerForm|backupConfiguration
+              type: single-step-form
+              label:
+                text: Backup Configuration form
+              discriminator:
+                targetType:
+                  type: string
+              elements:
+                - type: label-element
+                  label:
+                    text: labels.backupConfiguration.title
+                    hasLine: true
+                - type: input
+                  label:
+                    text: labels.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/name'
+                - disabled: true
+                  type: input
+                  label:
+                    text: labels.namespace
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/namespace'
+                  computed: initializeNamespace
+                - type: single-step-form
+                  discriminator:
+                    repositoryChoise:
+                      type: string
+                  elements:
+                    - type: label-element
+                      label:
+                        text: labels.repositories.title
+                        hasLine: true
+                        isSubsection: true
+                    - type: radio
+                      schema:
+                        $ref: 'discriminator#/properties/repositoryChoise'
+                      options:
+                        - text: options.createOrSelect.select.text
+                          value: select
+                        - text: options.createOrSelect.create.text
+                          value: create
+                      computed: initRepositoryChoise
+                      onChange: onRepositoryChoiseChange
+                    - if: showRepositorySelectOrCreate|select
+                      type: select
+                      label:
+                        text: labels.repositories.title
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/repository/properties/name'
+                      fetch: resourceNames|stash.appscode.com|v1alpha1|repositories
+                    - if: showRepositorySelectOrCreate|create
+                      type: single-step-form
+                      discriminator:
+                        backendType:
+                          type: string
+                      elements:
+                        - type: input
+                          label:
+                            text: labels.repositories.name
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/name'
+                          onChange: onRepositoryNameChange
+                        - disabled: true
+                          type: input
+                          label:
+                            text: labels.namespace
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/namespace'
+                          computed: initializeNamespace
+                        - type: label-element
+                          label:
+                            text: labels.repositories.backend.title
+                            isSubsection: true
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.type
+                          schema:
+                            $ref: 'discriminator#/properties/backendType'
+                          options:
+                            - text: Azure
+                              value: azure
+                            - text: B2
+                              value: b2
+                            - text: Google Cloud Service
+                              value: gcs
+                            - text: Local
+                              value: local
+                            - text: Rest
+                              value: rest
+                            - text: S3
+                              value: s3
+                            - text: Swift
+                              value: swift
+                          computed: initBackendType|/resources/stashAppscodeComRepositoryRepo
+                          onChange: onBackendTypeChange|/resources/stashAppscodeComRepositoryRepo
+                        - type: single-step-form
+                          if: showBackendForm|azure
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|b2
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|gcs
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|local
+                          discriminator:
+                            volumeSource:
+                              type: string
+                          elements:
+                            - type: select
+                              label:
+                                text: labels.repositories.backend.volumeSource
+                              schema:
+                                $ref: 'discriminator#/properties/volumeSource'
+                              options:
+                                - text: Host Path
+                                  value: hostPath
+                                - text: NFS
+                                  value: nfs
+                                - text: Persistant Volume Claim
+                                  value: persistentVolumeClaim
+                              computed: initVolumeSource|/resources/stashAppscodeComRepositoryRepo
+                              onChange: onVolumeSourceChange|/resources/stashAppscodeComRepositoryRepo
+                            - if: showVolumeSourceForm|hostPath
+                              type: single-step-form
+                              label:
+                                text: Host Path form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/subPath'
+                            - if: showVolumeSourceForm|nfs
+                              type: single-step-form
+                              label:
+                                text: NFS form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.server
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/server'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/subPath'
+                            - if: showVolumeSourceForm|persistentVolumeClaim
+                              type: single-step-form
+                              label:
+                                text: Persistant Volume Claim form
+                              elements:
+                                - type: select
+                                  label:
+                                    text: labels.repositories.backend.pvcName
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/claimName'
+                                  fetch: resourceNames|core|v1|persistentvolumeclaims
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/subPath'
+                        - type: single-step-form
+                          if: showBackendForm|rest
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.url
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/rest/properties/url'
+                        - type: single-step-form
+                          if: showBackendForm|s3
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.endPoint
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/endpoint'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.region
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/region'
+                        - type: single-step-form
+                          if: showBackendForm|swift
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/prefix'
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.secret
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/storageSecretName'
+                          fetch: resourceNames|core|v1|secrets
+                - label:
+                    text: labels.backupConfiguration.targetReference.title
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.apiVersion
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/apiVersion'
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.kind
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/kind'
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/name'
+                  computed: initalizeTargetReferenceName
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.taskName
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/task/properties/name'
+                - label:
+                    text: labels.backupConfiguration.retentionPolicy.title
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/name'
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.keepLast
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/keepLast'
+                - type: switch
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.prune
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/prune'
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.schedule
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/schedule'
+            - if: showInvokerForm|backupBlueprint
+              type: single-step-form
+              label:
+                text: Backup Blueprint form
+              discriminator:
+                backupBlueprintName:
+                  type: string
+                schedule:
+                  type: string
+                taskParameters:
+                  type: object
+                  additionalProperties:
+                    type: string
+              elements:
+                - type: label-element
+                  label:
+                    text: labels.backupBlueprint.title
+                    hasLine: true
+                - type: select
+                  label:
+                    text: labels.backupBlueprint.name
+                  schema:
+                    $ref: 'discriminator#/properties/backupBlueprintName'
+                  computed: initFromAnnotationValue|stash.appscode.com/backup-blueprint
+                  onChange: onBackupBlueprintNameChange
+                  fetch: unNamespacedResourceNames|stash.appscode.com|v1beta1|backupblueprints
+                - type: input
+                  label:
+                    text: labels.backupBlueprint.schedule
+                  schema:
+                    $ref: 'discriminator#/properties/schedule'
+                  computed: initFromAnnotationValue|stash.appscode.com/schedule
+                  onChange: onBackupBlueprintScheduleChange
+                - type: key-value-input-form
+                  label:
+                    text: labels.backupBlueprint.taskParameters
+                  schema:
+                    $ref: 'discriminator#/properties/taskParameters'
+                  keys:
+                    label:
+                      text: Key
+                  values:
+                    type: input
+                    label:
+                      text: Value
+                    schema:
+                      $ref: 'discriminator#/properties/taskParameters/additionalProperties'
+                  isArray: true
+                  computed: initFromAnnotationKeyValue|params.stash.appscode.com/
+                  onChange: onTaskParametersChange
+    id: backupconfiguration
+    title: steps.3.label
+  - form:
+      type: single-step-form
+      discriminator:
+        prePopulateDatabase:
+          type: string
+      elements:
+        - type: radio
+          label:
+            text: labels.prePopulateDatabase
+          schema:
+            $ref: 'discriminator#/properties/prePopulateDatabase'
+          options:
+            - text: options.yesOrNo.yes.text
+              value: 'yes'
+            - text: options.yesOrNo.no.text
+              value: 'no'
+          computed: initPrePopulateDatabase
+          onChange: onPrePopulateDatabaseChange
+        - if: showInitializationForm
+          type: single-step-form
+          discriminator:
+            dataSource:
+              type: string
+          elements:
+            - type: select
+              label:
+                text: labels.dataSource
+              schema:
+                $ref: 'discriminator#/properties/dataSource'
+              options:
+                - text: options.dataSource.script.text
+                  value: script
+                - text: options.dataSource.stashBackup.text
+                  value: stashBackup
+              computed: initDataSource
+              onChange: onDataSourceChange
+            - if: showScriptOrStashForm|script
+              type: single-step-form
+              discriminator:
+                sourceVolumeType:
+                  type: string
+              elements:
+                - type: input
+                  label:
+                    text: labels.script.path
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/init/properties/script/properties/scriptPath'
+                - label:
+                    text: labels.script.volume
+                    hasLine: true
+                  type: label-element
+                - type: select
+                  label:
+                    text: labels.script.volumeType
+                  schema:
+                    $ref: 'discriminator#/properties/sourceVolumeType'
+                  options:
+                    - text: options.scriptSourceVolumeType.configMap.text
+                      value: configMap
+                    - text: options.scriptSourceVolumeType.secret.text
+                      value: secret
+                  computed: initVolumeType
+                  onChange: onVolumeTypeChange
+                - if: showConfigMapOrSecretName|configMap
+                  type: select
+                  label:
+                    text: labels.script.volumeName
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/init/properties/script/properties/configMap/properties/name'
+                  fetch: resourceNames|core|v1|configmaps
+                - if: showConfigMapOrSecretName|secret
+                  type: select
+                  label:
+                    text: labels.script.volumeName
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/init/properties/script/properties/secret/properties/secretName'
+                  fetch: resourceNames|core|v1|secrets
+            - if: showScriptOrStashForm|stashBackup
+              type: single-step-form
+              elements:
+                - label:
+                    text: labels.restoreSession.title
+                    hasLine: true
+                  type: label-element
+                - type: input
+                  label:
+                    text: labels.restoreSession.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/metadata/properties/name'
+                - disabled: true
+                  type: input
+                  label:
+                    text: labels.namespace
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/metadata/properties/namespace'
+                  computed: initializeNamespace
+                - type: input
+                  label:
+                    text: labels.restoreSession.snapshot
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/rules/properties/0/properties/snapshots/properties/0'
+                - type: single-step-form
+                  discriminator:
+                    repositoryChoise:
+                      type: string
+                  elements:
+                    - type: label-element
+                      label:
+                        text: labels.repositories.title
+                        hasLine: true
+                    - type: radio
+                      options:
+                        - text: options.createOrSelect.select.text
+                          value: select
+                        - text: options.createOrSelect.create.text
+                          value: create
+                      schema:
+                        $ref: 'discriminator#/properties/repositoryChoise'
+                      onChange: onInitRepositoryChoiseChange
+                    - if: showRepositorySelectOrCreate|select
+                      type: select
+                      label:
+                        text: labels.repositories.name
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/repository/properties/name'
+                      fetch: resourceNames|stash.appscode.com|v1alpha1|repositories
+                    - if: showRepositorySelectOrCreate|create
+                      type: single-step-form
+                      discriminator:
+                        backendType:
+                          type: string
+                      elements:
+                        - type: input
+                          label:
+                            text: labels.repositories.name
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/metadata/properties/name'
+                          onChange: onInitRepositoryNameChange
+                        - disabled: true
+                          type: input
+                          label:
+                            text: labels.namespace
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/metadata/properties/namespace'
+                          computed: initializeNamespace
+                        - type: label-element
+                          label:
+                            text: labels.repositories.backend.title
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.type
+                          schema:
+                            $ref: 'discriminator#/properties/backendType'
+                          options:
+                            - text: Azure
+                              value: azure
+                            - text: B2
+                              value: b2
+                            - text: Google Cloud Service
+                              value: gcs
+                            - text: Local
+                              value: local
+                            - text: Rest
+                              value: rest
+                            - text: S3
+                              value: s3
+                            - text: Swift
+                              value: swift
+                          computed: initBackendType|/resources/stashAppscodeComRepositoryInitRepo
+                          onChange: onBackendTypeChange|/resources/stashAppscodeComRepositoryInitRepo
+                        - type: single-step-form
+                          if: showBackendForm|azure
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/azure/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/azure/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/azure/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|b2
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/b2/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/b2/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/b2/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|gcs
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/gcs/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/gcs/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/gcs/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|local
+                          discriminator:
+                            volumeSource:
+                              type: string
+                          elements:
+                            - type: select
+                              label:
+                                text: labels.repositories.backend.volumeSource
+                              schema:
+                                $ref: 'discriminator#/properties/volumeSource'
+                              options:
+                                - text: Host Path
+                                  value: hostPath
+                                - text: NFS
+                                  value: nfs
+                                - text: Persistant Volume Claim
+                                  value: persistentVolumeClaim
+                              computed: initVolumeSource|/resources/stashAppscodeComRepositoryInitRepo
+                              onChange: onVolumeSourceChange|/resources/stashAppscodeComRepositoryInitRepo
+                            - if: showVolumeSourceForm|hostPath
+                              type: single-step-form
+                              label:
+                                text: Host Path form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/subPath'
+                            - if: showVolumeSourceForm|nfs
+                              type: single-step-form
+                              label:
+                                text: NFS form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.server
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/server'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/subPath'
+                            - if: showVolumeSourceForm|persistentVolumeClaim
+                              type: single-step-form
+                              label:
+                                text: Persistant Volume Claim form
+                              elements:
+                                - type: select
+                                  label:
+                                    text: labels.repositories.backend.pvcName
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/claimName'
+                                  fetch: resourceNames|core|v1|persistentvolumeclaims
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/subPath'
+                        - type: single-step-form
+                          if: showBackendForm|rest
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.url
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/rest/properties/url'
+                        - type: single-step-form
+                          if: showBackendForm|s3
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.endPoint
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/s3/properties/endpoint'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/s3/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/s3/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.region
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/s3/properties/region'
+                        - type: single-step-form
+                          if: showBackendForm|swift
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/swift/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/swift/properties/prefix'
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.secret
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryInitRepo/properties/spec/properties/backend/properties/storageSecretName'
+                          fetch: resourceNames|core|v1|secrets
+                - type: single-step-form
+                  discriminator:
+                    customizeRestoreJobRuntimeSettings:
+                      type: string
+                  elements:
+                    - type: radio
+                      label:
+                        text: labels.runtimeSettings.choise
+                      options:
+                        - text: options.yesOrNo.yes.text
+                          value: 'yes'
+                        - text: options.yesOrNo.no.text
+                          value: 'no'
+                      schema:
+                        $ref: 'discriminator#/properties/customizeRestoreJobRuntimeSettings'
+                      computed: initCustomizeRestoreJobRuntimeSettings
+                      onChange: onCustomizeRestoreJobRuntimeSettingsChange
+                    - if: showRuntimeForm|yes
+                      type: single-step-form
+                      elements:
+                        - type: single-step-form
+                          label:
+                            text: Pod runtime settings
+                          elements:
+                            - type: label-element
+                              label:
+                                text: labels.runtimeSettings.pod.title
+                                hasLine: true
+                            - type: select
+                              label:
+                                text: labels.runtimeSettings.pod.serviceAccountName
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/serviceAccountName'
+                              fetch: resourceNames|core|v1|serviceaccounts
+                            - label:
+                                text: labels.runtimeSettings.pod.imagePullSecrets
+                              type: multiselect
+                              fetch: getImagePullSecrets
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/imagePullSecrets'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.title
+                                hasLine: true
+                              type: label-element
+                            - label:
+                                text: labels.runtimeSettings.securityContext.fsGroup
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/fsGroup'
+                            - type: switch
+                              label:
+                                text: labels.runtimeSettings.securityContext.runAsNonRoot
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/runAsNonRoot'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.runAsUser
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/runAsUser'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.runAsGroup
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/runAsGroup'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.seLinuxOptions.title
+                                isSubsection: true
+                              type: label-element
+                            - label:
+                                text: labels.runtimeSettings.securityContext.seLinuxOptions.level
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/seLinuxOptions/properties/level'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.seLinuxOptions.role
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/seLinuxOptions/properties/role'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.seLinuxOptions.type
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/seLinuxOptions/properties/type'
+                            - label:
+                                text: labels.runtimeSettings.securityContext.seLinuxOptions.user
+                              type: input
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/pod/properties/securityContext/properties/seLinuxOptions/properties/user'
+                        - type: single-step-form
+                          label:
+                            text: Container runtime settings
+                          elements:
+                            - type: label-element
+                              label:
+                                text: labels.runtimeSettings.container.title
+                                hasLine: true
+                            - type: single-step-form
+                              label:
+                                text: Resources
+                              elements:
+                                - type: label-element
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.title
+                                    hasLine: true
+                                - type: label-element
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.requests
+                                    isSubsection: true
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.cpu
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/resources/properties/requests/properties/cpu'
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.memory
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/resources/properties/requests/properties/memory'
+                                - type: label-element
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.limits
+                                    isSubsection: true
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.cpu
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/resources/properties/limits/properties/cpu'
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.resources.memory
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/resources/properties/limits/properties/memory'
+                            - type: single-step-form
+                              label:
+                                text: Nice
+                              elements:
+                                - type: label-element
+                                  label:
+                                    text: labels.runtimeSettings.container.nice.title
+                                    hasLine: true
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.nice.adjustment
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/nice/properties/adjustment'
+                            - type: single-step-form
+                              label:
+                                text: Ionice
+                              elements:
+                                - type: label-element
+                                  label:
+                                    text: labels.runtimeSettings.container.ionice.title
+                                    hasLine: true
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.ionice.class
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/ionice/properties/class'
+                                - type: input
+                                  label:
+                                    text: labels.runtimeSettings.container.ionice.classData
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/ionice/properties/classData'
+                            - type: single-step-form
+                              label:
+                                text: Security Context
+                              elements:
+                                - label:
+                                    text: labels.runtimeSettings.securityContext.title
+                                    hasLine: true
+                                  type: label-element
+                                - label:
+                                    text: labels.runtimeSettings.securityContext.privileged
+                                  type: switch
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/privileged'
+                                - type: switch
+                                  label:
+                                    text: labels.runtimeSettings.securityContext.runAsNonRoot
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/runAsNonRoot'
+                                - label:
+                                    text: labels.runtimeSettings.securityContext.runAsUser
+                                  type: input
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/runAsUser'
+                                - label:
+                                    text: labels.runtimeSettings.securityContext.runAsGroup
+                                  type: input
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/runAsGroup'
+                                - type: single-step-form
+                                  label:
+                                    text: SE linuxt options
+                                  elements:
+                                    - label:
+                                        text: labels.runtimeSettings.securityContext.seLinuxOptions.title
+                                        isSubsection: true
+                                      type: label-element
+                                    - label:
+                                        text: labels.runtimeSettings.securityContext.seLinuxOptions.level
+                                      type: input
+                                      schema:
+                                        $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/seLinuxOptions/properties/level'
+                                    - label:
+                                        text: labels.runtimeSettings.securityContext.seLinuxOptions.role
+                                      type: input
+                                      schema:
+                                        $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/seLinuxOptions/properties/role'
+                                    - label:
+                                        text: labels.runtimeSettings.securityContext.seLinuxOptions.type
+                                      type: input
+                                      schema:
+                                        $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/seLinuxOptions/properties/type'
+                                    - label:
+                                        text: labels.runtimeSettings.securityContext.seLinuxOptions.user
+                                      type: input
+                                      schema:
+                                        $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/securityContext/properties/seLinuxOptions/properties/user'
+                            - type: single-step-form-array
+                              label:
+                                text: labels.environment_variables
+                              addFormLabel: labels.environment_variable
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env'
+                              tableContents:
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: labels.name
+                                  path: name
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: Value From
+                                  path: valueFrom/type
+                                  computed: getValueFrom
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: RefName
+                                  path: refName
+                                  computed: getRefName
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: Key/Value
+                                  path: keyOrValue
+                                  computed: getKeyOrValue
+                              element:
+                                elements:
+                                  - label:
+                                      text: labels.name
+                                    type: input
+                                    schema:
+                                      $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/name'
+                                  - label:
+                                      text: Value From
+                                    schema:
+                                      $ref: 'discriminator#/valueFromType'
+                                    type: radio
+                                    computed: setValueFrom
+                                    onChange: onValueFromChange
+                                    options:
+                                      - text: Input
+                                        value: input
+                                      - text: Secret
+                                        value: secret
+                                      - text: ConfigMap
+                                        value: configMap
+                                  - if: isEqualToValueFromType|input
+                                    label:
+                                      text: labels.value
+                                    type: input
+                                    schema:
+                                      $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/value'
+                                  - type: single-step-form
+                                    label:
+                                      text: configMapOrSecret
+                                    schema:
+                                      $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom'
+                                    elements:
+                                      - if: isEqualToValueFromType|configMap
+                                        type: single-step-form
+                                        label:
+                                          text: configMap
+                                        schema:
+                                          $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/configMapKeyRef'
+                                        elements:
+                                          - if: showConfigMapSelectField
+                                            label:
+                                              text: labels.config_map_name
+                                            type: select
+                                            fetch: resourceNames|core|v1|configmaps
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                                          - if: showConfigMapInputField
+                                            label:
+                                              text: labels.config_map_name
+                                            type: input
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                                          - if: hasConfigMapKeys
+                                            label:
+                                              text: labels.config_map_key
+                                            fetch: getConfigMapKeys
+                                            type: select
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                                          - if: hasNoConfigMapKeys
+                                            label:
+                                              text: labels.config_map_key
+                                            type: input
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                                      - if: isEqualToValueFromType|secret
+                                        type: single-step-form
+                                        label:
+                                          text: secret
+                                        schema:
+                                          $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/secretKeyRef'
+                                        elements:
+                                          - if: hasExistingSecret
+                                            label:
+                                              text: labels.secret_name
+                                            type: select
+                                            fetch: resourceNames|core|v1|secrets
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                                          - if: hasNoExistingSecret
+                                            label:
+                                              text: labels.secret_name
+                                            type: input
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                                          - if: hasSecretKeys
+                                            label:
+                                              text: labels.secret_key
+                                            type: select
+                                            fetch: getSecretKeys
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                                          - if: hasNoSecretKeys
+                                            label:
+                                              text: labels.secret_key
+                                            type: input
+                                            schema:
+                                              $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                                    discriminator:
+                                      dis1:
+                                        type: string
+                                        default: it
+                                type: single-step-form
+                                discriminator:
+                                  valueFromType:
+                                    type: string
+                                    default: input
+                            - type: single-step-form-array
+                              label:
+                                text: labels.environmentVariablesFrom
+                              addFormLabel: labels.environmentVariablesFrom
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/envFrom'
+                              tableContents:
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: Ref Type
+                                  path: refType
+                                  computed: showRefType
+                                - type: value
+                                  typeOfValue: string
+                                  inTableColumn: true
+                                  label:
+                                    text: Ref Name
+                                  path: refName
+                                  computed: showRefName
+                              element:
+                                type: single-step-form
+                                discriminator:
+                                  refType:
+                                    type: string
+                                    default: secret
+                                elements:
+                                  - label:
+                                      text: Value From
+                                    schema:
+                                      $ref: 'discriminator#/refType'
+                                    type: radio
+                                    computed: initializeRefType
+                                    onChange: onRefTypeChange
+                                    options:
+                                      - text: Secret
+                                        value: secret
+                                      - text: ConfigMap
+                                        value: configMap
+                                  - type: single-step-form
+                                    if: showRefSelect|configMap
+                                    label:
+                                      text: envFrom configMap
+                                    schema:
+                                      $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/envFrom/items/properties/configMapRef'
+                                    elements:
+                                      - label:
+                                          text: Select ConfigMap
+                                        type: select
+                                        fetch: resourceNames|core|v1|configmaps
+                                        schema:
+                                          $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/envFrom/items/properties/configMapRef/properties/name'
+                                  - type: single-step-form
+                                    if: showRefSelect|secret
+                                    label:
+                                      text: envFrom secret
+                                    schema:
+                                      $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/envFrom/items/properties/secretRef'
+                                    elements:
+                                      - label:
+                                          text: Select Secret
+                                        type: select
+                                        fetch: resourceNames|core|v1|secrets
+                                        schema:
+                                          $ref: 'schema#/properties/resources/properties/stashAppscodeComRestoreSessionInit/properties/spec/properties/runtimeSettings/properties/container/properties/envFrom/items/properties/secretRef/properties/name'
+            - type: switch
+              label:
+                text: labels.waitForInitialRestore
+              schema:
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/init/properties/waitForInitialRestore'
+    id: initialization
+    title: steps.4.label
+  - form:
+      elements:
+        - type: switch
+          label:
+            text: labels.enable_monitoring
+          schema:
+            $ref: 'discriminator#/enableMonitoring'
+          computed: isValueExistInModel|/resources/kubedbComMongoDB/spec/monitor
+          onChange: onEnableMonitoringChange
+        - if: showMonitoringSection
+          type: single-step-form
+          elements:
+            - label:
+                text: labels.agent
+              schema:
+                $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/agent'
+              type: radio
+              hasDescription: true
+              options:
+                - value: prometheus.io/operator
+                  text: options.agent.prometheus_operator.label
+                  description: options.agent.prometheus_operator.description
+                - value: prometheus.io/builtin
+                  text: options.agent.prometheus_builtin.label
+                  description: options.agent.prometheus_builtin.description
+                - value: prometheus.io
+                  text: options.agent.prometheus.label
+                  description: options.agent.prometheus.description
+            - if: isEqualToModelPathValue|prometheus.io/operator|/resources/kubedbComMongoDB/spec/monitor/agent
+              type: single-step-form
+              elements:
+                - label:
+                    text: labels.service_monitor_configuration
+                    hasLine: true
+                  type: label-element
+                  customClass: mb-10
+                - isArray: true
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/serviceMonitor/properties/labels'
+                  keys:
+                    label:
+                      text: labels.labels.key
+                      isSubsection: true
+                  label:
+                    text: labels.labels.label
+                  type: key-value-input-form
+                  values:
+                    label:
+                      text: labels.labels.value
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/serviceMonitor/properties/labels/additionalProperties'
+                - label:
+                    text: labels.scrapping_interval
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/serviceMonitor/properties/interval'
+            - if: isEqualToModelPathValue|prometheus.io|/resources/kubedbComMongoDB/spec/monitor/agent
+              type: single-step-form
+              elements:
+                - label:
+                    text: labels.service_monitor
+                    hasLine: true
+                  type: label-element
+                  customClass: mb-10
+                - type: single-step-form-array
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/endpoints'
+                  label:
+                    text: labels.endpoints
+                  addFormLabel: labels.endpoint
+                  tableContents:
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: labels.honor_labels
+                      path: honorLabels
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: labels.interval
+                      path: interval
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: labels.path
+                      path: path
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: labels.port
+                      path: port
+                  element:
+                    elements:
+                      - type: switch
+                        label:
+                          text: labels.honor_labels
+                        computed: setHonorLabels
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/endpoints/items/properties/honorLabels'
+                      - label:
+                          text: labels.interval
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/endpoints/items/properties/interval'
+                      - label:
+                          text: labels.path
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/endpoints/items/properties/path'
+                      - label:
+                          text: labels.port
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/endpoints/items/properties/port'
+                    type: single-step-form
+                - type: single-step-form
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/namespaceSelector'
+                  elements:
+                    - type: select
+                      fetch: getResources|core|v1|namespaces
+                      computed: setValueFromModel|/metadata/release/namespace
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/namespaceSelector/properties/matchNames'
+                - type: single-step-form
+                  elements:
+                    - isArray: true
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/selector/properties/matchLabels'
+                      keys:
+                        label:
+                          text: labels.labels.key
+                      label:
+                        text: labels.labels.label
+                      type: key-value-input-form
+                      values:
+                        label:
+                          text: labels.labels.value
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/monitoringCoreosComServiceMonitor/properties/spec/properties/selector/properties/matchLabels/additionalProperties'
+            - label:
+                text: labels.exporter_configuration
+                hasLine: true
+              type: label-element
+            - type: switch
+              label:
+                text: labels.customize_exporter
+              schema:
+                $ref: 'discriminator#/customizeExporter'
+              onChange: onCustomizeExporterChange
+            - if: showCustomizeExporterSection
+              type: single-step-form
+              elements:
+                - label:
+                    text: labels.port
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/port'
+                - schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/args'
+                  type: list-input-form
+                  element:
+                    label:
+                      text: labels.args
+                      isSubsection: true
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/args/items'
+                    type: input
+                  label:
+                    text: labels.args
+                - type: single-step-form-array
+                  label:
+                    text: labels.environment_variables
+                  addFormLabel: labels.environment_variable
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env'
+                  tableContents:
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: labels.name
+                      path: name
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: Value From
+                      path: valueFrom/type
+                      computed: getValueFrom
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: RefName
+                      path: refName
+                      computed: getRefName
+                    - type: value
+                      typeOfValue: string
+                      inTableColumn: true
+                      label:
+                        text: Key/Value
+                      path: keyOrValue
+                      computed: getKeyOrValue
+                  element:
+                    elements:
+                      - label:
+                          text: labels.name
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/name'
+                      - label:
+                          text: Value From
+                        schema:
+                          $ref: 'discriminator#/valueFromType'
+                        type: radio
+                        computed: setValueFrom
+                        onChange: onValueFromChange
+                        options:
+                          - text: Input
+                            value: input
+                          - text: Secret
+                            value: secret
+                          - text: ConfigMap
+                            value: configMap
+                      - if: isEqualToValueFromType|input
+                        label:
+                          text: labels.value
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/value'
+                      - type: single-step-form
+                        label:
+                          text: configMapOrSecret
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom'
+                        elements:
+                          - if: isEqualToValueFromType|configMap
+                            type: single-step-form
+                            label:
+                              text: configMap
+                            schema:
+                              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/configMapKeyRef'
+                            elements:
+                              - if: showConfigMapSelectField
+                                label:
+                                  text: labels.config_map_name
+                                type: select
+                                fetch: getConfigMapName
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                              - if: showConfigMapInputField
+                                label:
+                                  text: labels.config_map_name
+                                type: input
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                              - if: hasConfigMapKeys
+                                label:
+                                  text: labels.config_map_key
+                                fetch: getConfigMapKeys
+                                type: select
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                              - if: hasNoConfigMapKeys
+                                label:
+                                  text: labels.config_map_key
+                                type: input
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                          - if: isEqualToValueFromType|secret
+                            type: single-step-form
+                            label:
+                              text: secret
+                            schema:
+                              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/secretKeyRef'
+                            elements:
+                              - if: hasExistingSecret
+                                label:
+                                  text: labels.secret_name
+                                type: select
+                                fetch: getSecrets
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                              - if: hasNoExistingSecret
+                                label:
+                                  text: labels.secret_name
+                                type: input
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                              - if: hasSecretKeys
+                                label:
+                                  text: labels.secret_key
+                                type: select
+                                fetch: getSecretKeys
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                              - if: hasNoSecretKeys
+                                label:
+                                  text: labels.secret_key
+                                type: input
+                                schema:
+                                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                        discriminator:
+                          dis1:
+                            type: string
+                            default: it
+                    type: single-step-form
+                    discriminator:
+                      valueFromType:
+                        type: string
+                        default: input
+                - label:
+                    text: labels.resources
+                    hasLine: true
+                  type: label-element
+                  customClass: mb-10 mt-20
+                - label:
+                    text: labels.request
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - label:
+                    text: labels.cpu
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/resources/properties/requests/properties/cpu'
+                - label:
+                    text: labels.memory
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/resources/properties/requests/properties/memory'
+                - label:
+                    text: labels.limit
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - label:
+                    text: labels.cpu
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/resources/properties/limits/properties/cpu'
+                - label:
+                    text: labels.memory
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/resources/properties/limits/properties/memory'
+                - label:
+                    text: labels.security_context
+                    hasLine: true
+                  type: label-element
+                - label:
+                    text: labels.run_as_user
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/securityContext/properties/runAsUser'
+                - label:
+                    text: labels.run_as_group
+                  customClass: mb-0
+                  type: input
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/monitor/properties/prometheus/properties/exporter/properties/securityContext/properties/runAsGroup'
+          discriminator:
+            customizeExporter:
+              type: boolean
+              default: true
+      discriminator:
+        enableMonitoring:
+          type: boolean
+          default: true
+      type: single-step-form
+    id: monitoring
+    title: steps.5.label
+  - form:
+      elements:
+        - label:
+            text: labels.pod_template
+            hasLine: true
+          type: label-element
+        - isArray: true
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/metadata/properties/annotations'
+          keys:
+            label:
+              text: labels.labels.key
+          label:
+            text: labels.pod_annotations
+          type: key-value-input-form
+          values:
+            label:
+              text: labels.labels.value
+            type: input
+            schema:
+              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/metadata/properties/annotations/additionalProperties'
+        - isArray: true
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/controller/properties/annotations'
+          keys:
+            label:
+              text: labels.labels.key
+          label:
+            text: labels.controller_annotations
+          type: key-value-input-form
+          values:
+            label:
+              text: labels.labels.value
+            type: input
+            schema:
+              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/controller/properties/annotations/additionalProperties'
+        - label:
+            text: labels.pod_spec
+          customClass: mb-5
+          type: label-element
+        - type: single-step-form-array
+          label:
+            text: labels.preferred_during_scheduling_ignored_during_execution
+          addFormLabel: labels.preferred_during_scheduling_ignored_during_execution
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution'
+          customClass: mb-20
+          tableContents:
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.weight
+              path: weight
+            - type: value
+              typeOfValue: object-array
+              label:
+                text: labels.match_expressions
+              path: preference/matchExpressions
+              tableContents:
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.key
+                  path: key
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.operator
+                  path: operator
+                - type: value
+                  typeOfValue: array
+                  label:
+                    text: labels.values
+                  path: values
+            - type: value
+              typeOfValue: object-array
+              label:
+                text: labels.match_fields
+              path: preference/matchFields
+              tableContents:
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.key
+                  path: key
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.operator
+                  path: operator
+                - type: value
+                  typeOfValue: array
+                  label:
+                    text: labels.values
+                  path: values
+          element:
+            elements:
+              - type: single-step-form
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference'
+                elements:
+                  - type: single-step-form-array
+                    label:
+                      text: labels.match_expressions
+                    addFormLabel: labels.match_expression
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchExpressions'
+                    tableContents:
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.key
+                        path: key
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.operator
+                        path: operator
+                      - type: value
+                        typeOfValue: array
+                        label:
+                          text: labels.values
+                        path: values
+                    element:
+                      elements:
+                        - label:
+                            text: labels.key
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchExpressions/items/properties/key'
+                        - label:
+                            text: labels.operator
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchExpressions/items/properties/operator'
+                        - schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchExpressions/items/properties/values'
+                          type: list-input-form
+                          element:
+                            label:
+                              text: labels.value
+                            schema:
+                              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchExpressions/items/properties/values/items'
+                            type: input
+                          label:
+                            text: labels.values
+                      type: single-step-form
+                  - type: single-step-form-array
+                    label:
+                      text: labels.match_fields
+                    addFormLabel: labels.match_field
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchFields'
+                    tableContents:
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.key
+                        path: key
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.operator
+                        path: operator
+                      - type: value
+                        typeOfValue: array
+                        label:
+                          text: labels.values
+                        path: values
+                    element:
+                      elements:
+                        - label:
+                            text: labels.key
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchFields/items/properties/key'
+                        - label:
+                            text: labels.operator
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchFields/items/properties/operator'
+                        - schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchFields/items/properties/values'
+                          type: list-input-form
+                          element:
+                            label:
+                              text: labels.value
+                            schema:
+                              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/preference/properties/matchFields/items/properties/values/items'
+                            type: input
+                          label:
+                            text: labels.values
+                      type: single-step-form
+              - label:
+                  text: labels.weight
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/preferredDuringSchedulingIgnoredDuringExecution/items/properties/weight'
+            type: single-step-form
+        - type: single-step-form-array
+          label:
+            text: labels.node_selector_terms
+          addFormLabel: labels.node_selector_terms
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms'
+          tableContents:
+            - type: value
+              typeOfValue: object-array
+              inTableColumn: true
+              label:
+                text: labels.match_expressions
+              path: matchExpressions
+              tableContents:
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.key
+                  path: key
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.operator
+                  path: operator
+                - type: value
+                  typeOfValue: array
+                  label:
+                    text: labels.values
+                  path: values
+            - type: value
+              typeOfValue: object-array
+              inTableColumn: true
+              label:
+                text: labels.match_fields
+              path: matchFields
+              tableContents:
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.key
+                  path: key
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.operator
+                  path: operator
+                - type: value
+                  typeOfValue: array
+                  label:
+                    text: labels.values
+                  path: values
+          element:
+            elements:
+              - type: single-step-form-array
+                label:
+                  text: labels.match_expressions
+                addFormLabel: labels.match_expression
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchExpressions'
+                tableContents:
+                  - type: value
+                    typeOfValue: string
+                    inTableColumn: true
+                    label:
+                      text: labels.key
+                    path: key
+                  - type: value
+                    typeOfValue: string
+                    inTableColumn: true
+                    label:
+                      text: labels.operator
+                    path: operator
+                  - type: value
+                    typeOfValue: array
+                    label:
+                      text: labels.values
+                    path: values
+                element:
+                  elements:
+                    - label:
+                        text: labels.key
+                      type: input
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchExpressions/items/properties/key'
+                    - label:
+                        text: labels.operator
+                      type: input
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchExpressions/items/properties/operator'
+                    - schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchExpressions/items/properties/values'
+                      type: list-input-form
+                      element:
+                        label:
+                          text: labels.value
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchExpressions/items/properties/values/items'
+                        type: input
+                      label:
+                        text: labels.values
+                  type: single-step-form
+              - type: single-step-form-array
+                label:
+                  text: labels.match_fields
+                addFormLabel: labels.match_field
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchFields'
+                tableContents:
+                  - type: value
+                    typeOfValue: string
+                    inTableColumn: true
+                    label:
+                      text: labels.key
+                    path: key
+                  - type: value
+                    typeOfValue: string
+                    inTableColumn: true
+                    label:
+                      text: labels.operator
+                    path: operator
+                  - type: value
+                    typeOfValue: array
+                    label:
+                      text: labels.values
+                    path: values
+                element:
+                  elements:
+                    - label:
+                        text: labels.key
+                      type: input
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchFields/items/properties/key'
+                    - label:
+                        text: labels.operator
+                      type: input
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchFields/items/properties/operator'
+                    - schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchFields/items/properties/values'
+                      type: list-input-form
+                      element:
+                        label:
+                          text: labels.value
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/affinity/properties/nodeAffinity/properties/requiredDuringSchedulingIgnoredDuringExecution/properties/nodeSelectorTerms/items/properties/matchFields/items/properties/values/items'
+                        type: input
+                      label:
+                        text: labels.values
+                  type: single-step-form
+            type: single-step-form
+        - label:
+            text: labels.image_pull_secrets
+          type: multiselect
+          fetch: getImagePullSecrets
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/imagePullSecrets'
+        - schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/nodeSelector'
+          keys:
+            label:
+              text: labels.labels.key
+          label:
+            text: labels.node_selector
+          type: key-value-input-form
+          values:
+            label:
+              text: labels.labels.value
+            type: input
+            schema:
+              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/nodeSelector/additionalProperties'
+        - label:
+            text: labels.security_context
+            hasLine: true
+          type: label-element
+        - type: switch
+          label:
+            text: labels.run_as_non_root
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/runAsNonRoot'
+        - label:
+            text: labels.fs_group
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/fsGroup'
+        - label:
+            text: labels.run_as_group
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/runAsGroup'
+        - label:
+            text: labels.run_as_user
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/runAsUser'
+        - label:
+            text: labels.se_linux_options
+            hasLine: true
+            isSubsection: true
+          type: label-element
+        - label:
+            text: labels.level
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/seLinuxOptions/properties/level'
+        - label:
+            text: labels.role
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/seLinuxOptions/properties/role'
+        - label:
+            text: labels.type
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/seLinuxOptions/properties/type'
+        - label:
+            text: labels.user
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/securityContext/properties/seLinuxOptions/properties/user'
+        - label:
+            text: labels.service_account_name
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/serviceAccountName'
+        - label:
+            text: labels.resources
+            hasLine: true
+          type: label-element
+          customClass: mb-10
+        - label:
+            text: labels.request
+            hasLine: true
+            isSubsection: true
+          type: label-element
+        - label:
+            text: labels.cpu
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/resources/properties/requests/properties/cpu'
+        - label:
+            text: labels.memory
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/resources/properties/requests/properties/memory'
+        - label:
+            text: labels.limit
+            hasLine: true
+            isSubsection: true
+          type: label-element
+        - label:
+            text: labels.cpu
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/resources/properties/limits/properties/cpu'
+        - label:
+            text: labels.memory
+          type: input
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/resources/properties/limits/properties/memory'
+        - type: single-step-form-array
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations'
+          label:
+            text: labels.tolerations
+          customClass: mb-20
+          addFormLabel: labels.toleration
+          tableContents:
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.effect
+              path: effect
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.key
+              path: key
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.operator
+              path: operator
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.toleration_seconds
+              path: tolerationSeconds
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.value
+              path: value
+          element:
+            elements:
+              - label:
+                  text: labels.effect
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations/items/properties/effect'
+              - label:
+                  text: labels.key
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations/items/properties/key'
+              - label:
+                  text: labels.operator
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations/items/properties/operator'
+              - label:
+                  text: labels.toleration_seconds
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations/items/properties/tolerationSeconds'
+              - label:
+                  text: labels.value
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/tolerations/items/properties/value'
+            type: single-step-form
+        - type: single-step-form-array
+          label:
+            text: labels.environment_variables
+          addFormLabel: labels.environment_variable
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env'
+          tableContents:
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.name
+              path: name
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: Value From
+              path: valueFrom/type
+              computed: getValueFrom
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: RefName
+              path: refName
+              computed: getRefName
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: Key/Value
+              path: keyOrValue
+              computed: getKeyOrValue
+          element:
+            elements:
+              - label:
+                  text: labels.name
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/name'
+              - label:
+                  text: Value From
+                schema:
+                  $ref: 'discriminator#/valueFromType'
+                type: radio
+                computed: setValueFrom
+                onChange: onValueFromChange
+                options:
+                  - text: Input
+                    value: input
+                  - text: Secret
+                    value: secret
+                  - text: ConfigMap
+                    value: configMap
+              - if: isEqualToValueFromType|input
+                label:
+                  text: labels.value
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/value'
+              - type: single-step-form
+                label:
+                  text: configMapOrSecret
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom'
+                elements:
+                  - if: isEqualToValueFromType|configMap
+                    type: single-step-form
+                    label:
+                      text: configMap
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/configMapKeyRef'
+                    elements:
+                      - if: showConfigMapSelectField
+                        label:
+                          text: labels.config_map_name
+                        type: select
+                        fetch: getConfigMapName
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                      - if: showConfigMapInputField
+                        label:
+                          text: labels.config_map_name
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/name'
+                      - if: hasConfigMapKeys
+                        label:
+                          text: labels.config_map_key
+                        fetch: getConfigMapKeys
+                        type: select
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                      - if: hasNoConfigMapKeys
+                        label:
+                          text: labels.config_map_key
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/configMapKeyRef/properties/key'
+                  - if: isEqualToValueFromType|secret
+                    type: single-step-form
+                    label:
+                      text: secret
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/secretKeyRef'
+                    elements:
+                      - if: hasExistingSecret
+                        label:
+                          text: labels.secret_name
+                        type: select
+                        fetch: getSecrets
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                      - if: hasNoExistingSecret
+                        label:
+                          text: labels.secret_name
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/name'
+                      - if: hasSecretKeys
+                        label:
+                          text: labels.secret_key
+                        type: select
+                        fetch: getSecretKeys
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                      - if: hasNoSecretKeys
+                        label:
+                          text: labels.secret_key
+                        type: input
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/podTemplate/properties/spec/properties/env/items/properties/valueFrom/properties/secretKeyRef/properties/key'
+                discriminator:
+                  dis1:
+                    type: string
+                    default: it
+            type: single-step-form
+            discriminator:
+              valueFromType:
+                type: string
+                default: input
+      type: single-step-form
+    id: pod-template
+    title: steps.6.label
+  - form:
+      elements:
+        - type: single-step-form-array
+          label:
+            text: labels.service_templates
+          addFormLabel: labels.service_template
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates'
+          tableContents:
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.alias
+              path: alias
+            - type: value
+              typeOfValue: array
+              label:
+                text: labels.service_template_annotations
+              path: metadata/annotations
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.cluster_ip
+              path: spec/clusterIP
+            - type: value
+              typeOfValue: array
+              label:
+                text: labels.external_ips
+                isSubsection: true
+              path: spec/externalIPs
+            - type: value
+              typeOfValue: string
+              label:
+                text: labels.external_traffic_policy
+              path: spec/externalTrafficPolicy
+            - type: value
+              typeOfValue: string
+              label:
+                text: labels.health_check_node_port
+              path: spec/healthCheckNodePort
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.load_balancer_ip
+              path: spec/loadBalancerIP
+            - type: value
+              typeOfValue: array
+              label:
+                text: labels.load_balancer_source_ranges
+                isSubsection: true
+              path: spec/loadBalancerSourceRanges
+            - type: value
+              typeOfValue: object-array
+              label:
+                text: labels.ports
+                isSubsection: true
+              path: spec/ports
+              tableContents:
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.name
+                  path: name
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.node_port
+                    isSubsection: true
+                  path: nodePort
+                - type: value
+                  typeOfValue: string
+                  inTableColumn: true
+                  label:
+                    text: labels.port
+                    isSubsection: true
+                  path: port
+            - type: value
+              typeOfValue: string
+              label:
+                text: labels.timeout_seconds
+              path: spec/sessionAffinityConfig/clientIP/timeoutSeconds
+            - type: value
+              typeOfValue: string
+              inTableColumn: true
+              label:
+                text: labels.type
+              path: spec/type
+          element:
+            label:
+              text: labels.service_template
+            elements:
+              - label:
+                  text: labels.alias
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/alias'
+              - type: single-step-form
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/metadata'
+                elements:
+                  - isArray: true
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/metadata/properties/annotations'
+                    keys:
+                      label:
+                        text: labels.labels.key
+                    label:
+                      text: labels.service_template_annotations
+                    type: key-value-input-form
+                    values:
+                      label:
+                        text: labels.labels.value
+                      type: input
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/metadata/properties/annotations/additionalProperties'
+              - type: single-step-form
+                schema:
+                  $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec'
+                elements:
+                  - label:
+                      text: labels.cluster_ip
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/clusterIP'
+                  - schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/externalIPs'
+                    type: list-input-form
+                    element:
+                      label:
+                        text: labels.external_ip
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/externalIPs/items'
+                      type: input
+                    label:
+                      text: labels.external_ips
+                  - label:
+                      text: labels.external_traffic_policy
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/externalTrafficPolicy'
+                  - label:
+                      text: labels.health_check_node_port
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/healthCheckNodePort'
+                  - label:
+                      text: labels.load_balancer_ip
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/loadBalancerIP'
+                  - schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/loadBalancerSourceRanges'
+                    type: list-input-form
+                    element:
+                      label:
+                        text: labels.load_balancer_source_range
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/loadBalancerSourceRanges/items'
+                      type: input
+                    label:
+                      text: labels.load_balancer_source_ranges
+                  - type: single-step-form-array
+                    label:
+                      text: labels.ports
+                    addFormLabel: labels.port
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/ports'
+                    customClass: mb-20
+                    tableContents:
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.name
+                        path: name
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.node_port
+                        path: nodePort
+                      - type: value
+                        typeOfValue: string
+                        inTableColumn: true
+                        label:
+                          text: labels.port
+                        path: port
+                    element:
+                      label:
+                        text: labels.port
+                      elements:
+                        - label:
+                            text: labels.name
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/ports/items/properties/name'
+                        - label:
+                            text: labels.node_port
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/ports/items/properties/nodePort'
+                        - label:
+                            text: labels.port
+                          type: input
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/ports/items/properties/port'
+                      type: single-step-form
+                  - type: single-step-form
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/sessionAffinityConfig'
+                    elements:
+                      - type: single-step-form
+                        schema:
+                          $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/sessionAffinityConfig/properties/clientIP'
+                        elements:
+                          - label:
+                              text: labels.timeout_seconds
+                            type: input
+                            schema:
+                              $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/sessionAffinityConfig/properties/clientIP/properties/timeoutSeconds'
+                  - label:
+                      text: labels.type
+                    type: input
+                    schema:
+                      $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/serviceTemplates/items/properties/spec/properties/type'
+            type: single-step-form
+      type: single-step-form
+    id: networking
+    title: steps.7.label
+  - form:
+      elements:
+        - label:
+            text: labels.configuration_source
+          type: radio
+          schema:
+            $ref: 'discriminator#/configurationSource'
+          options:
+            - text: options.configuration_source.use_existing_config.label
+              value: use-existing-config
+            - text: options.configuration_source.create_new_config.label
+              value: create-new-config
+        - if: isEqualToDiscriminatorPath|use-existing-config|/configurationSource
+          label:
+            text: labels.name
+          type: select
+          fetch: getSecrets
+          schema:
+            $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/configSecret/properties/name'
+        - if: isEqualToDiscriminatorPath|create-new-config|/configurationSource
+          type: single-step-form
+          elements:
+            - label:
+                text: labels.name
+              type: input
+              onChange: onConfigSecretNameChange
+              schema:
+                $ref: 'schema#/properties/resources/properties/secretConfig/properties/metadata/properties/name'
+            - if: returnFalse
+              label:
+                text: labels.namespace
+              type: input
+              computed: setValueFromModel|/metadata/release/namespace
+              schema:
+                $ref: 'schema#/properties/resources/properties/secretConfig/properties/metadata/properties/namespace'
+            - isArray: true
+              schema:
+                $ref: 'schema#/properties/resources/properties/secretConfig/properties/stringData/'
+              keys:
+                label:
+                  text: labels.labels.key
+              label:
+                text: labels.configuration_files
+              type: key-text-area-input-form
+              values:
+                label:
+                  text: labels.labels.value
+                type: input
+                schema:
+                  $ref: 'schema#/properties/resources/properties/secretConfig/properties/stringData/additionalProperties'
+      discriminator:
+        configurationSource:
+          type: string
+          default: use-existing-config
+      type: single-step-form
+    id: custom-config
+    title: steps.8.label
 type: multi-step-form
 hasPreviewPanel: true
