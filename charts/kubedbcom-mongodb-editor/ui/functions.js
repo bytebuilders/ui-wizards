@@ -1,3 +1,9 @@
+function disableLableChecker({ itemCtx }) {
+  const { key } = itemCtx;
+  if (key.startsWith("app.kubernetes.io")) return true;
+  else return false;
+}
+
 function isEqualToModelPathValue(
   { model, getValue, watchDependency },
   value,
@@ -1854,6 +1860,7 @@ function isValueExistInModel({ model, getValue }, path) {
 }
 
 return {
+  disableLableChecker,
   isEqualToModelPathValue,
   showAuthPasswordField,
   showAuthSecretField,

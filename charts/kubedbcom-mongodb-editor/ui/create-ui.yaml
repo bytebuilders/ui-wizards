@@ -37,6 +37,7 @@ steps:
             type: input
             schema:
               $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/labels/additionalProperties'
+          individualItemDisabilityCheck: disableLableChecker
         - isArray: true
           schema:
             $ref: 'schema#/properties/resources/properties/appApplication/properties/metadata/properties/annotations'
