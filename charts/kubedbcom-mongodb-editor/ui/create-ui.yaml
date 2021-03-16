@@ -437,436 +437,6 @@ steps:
   - form:
       type: single-step-form
       discriminator:
-        scheduleBackup:
-          type: boolean
-      elements:
-        - type: radio
-          label:
-            text: labels.backup.title
-          schema:
-            $ref: 'discriminator#/properties/scheduleBackup'
-          options:
-            - text: options.yesOrNo.yes.text
-              value: 'yes'
-            - text: options.yesOrNo.no.text
-              value: 'no'
-          computed: initScheduleBackup
-          onChange: onScheduleBackupChange
-        - type: single-step-form
-          label:
-            text: Backup Form
-          if: showBackupForm
-          discriminator:
-            backupInvoker:
-              type: string
-          elements:
-            - type: select
-              label:
-                text: labels.backup.invoker
-              schema:
-                $ref: 'discriminator#/properties/backupInvoker'
-              options:
-                - text: Backup Configuration
-                  value: backupConfiguration
-                - text: Backup Blueprint
-                  value: backupBlueprint
-              computed: initBackupInvoker
-              onChange: onBackupInvokerChange
-            - if: showInvokerForm|backupConfiguration
-              type: single-step-form
-              label:
-                text: Backup Configuration form
-              discriminator:
-                targetType:
-                  type: string
-              elements:
-                - type: label-element
-                  label:
-                    text: labels.backupConfiguration.title
-                    hasLine: true
-                - type: input
-                  label:
-                    text: labels.name
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/name'
-                - disabled: true
-                  type: input
-                  label:
-                    text: labels.namespace
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/namespace'
-                  computed: initializeNamespace
-                - type: single-step-form
-                  discriminator:
-                    repositoryChoise:
-                      type: string
-                  elements:
-                    - type: label-element
-                      label:
-                        text: labels.repositories.title
-                        hasLine: true
-                        isSubsection: true
-                    - type: radio
-                      schema:
-                        $ref: 'discriminator#/properties/repositoryChoise'
-                      options:
-                        - text: options.createOrSelect.select.text
-                          value: select
-                        - text: options.createOrSelect.create.text
-                          value: create
-                      computed: initRepositoryChoise
-                      onChange: onRepositoryChoiseChange
-                    - if: showRepositorySelectOrCreate|select
-                      type: select
-                      label:
-                        text: labels.repositories.title
-                      schema:
-                        $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/repository/properties/name'
-                      fetch: resourceNames|stash.appscode.com|v1alpha1|repositories
-                    - if: showRepositorySelectOrCreate|create
-                      type: single-step-form
-                      discriminator:
-                        backendType:
-                          type: string
-                      elements:
-                        - type: input
-                          label:
-                            text: labels.repositories.name
-                          schema:
-                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/name'
-                          onChange: onRepositoryNameChange
-                        - disabled: true
-                          type: input
-                          label:
-                            text: labels.namespace
-                          schema:
-                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/namespace'
-                          computed: initializeNamespace
-                        - type: label-element
-                          label:
-                            text: labels.repositories.backend.title
-                            isSubsection: true
-                        - type: select
-                          label:
-                            text: labels.repositories.backend.type
-                          schema:
-                            $ref: 'discriminator#/properties/backendType'
-                          options:
-                            - text: Azure
-                              value: azure
-                            - text: B2
-                              value: b2
-                            - text: Google Cloud Service
-                              value: gcs
-                            - text: Local
-                              value: local
-                            - text: Rest
-                              value: rest
-                            - text: S3
-                              value: s3
-                            - text: Swift
-                              value: swift
-                          computed: initBackendType|/resources/stashAppscodeComRepositoryRepo
-                          onChange: onBackendTypeChange|/resources/stashAppscodeComRepositoryRepo
-                        - type: single-step-form
-                          if: showBackendForm|azure
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.container
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/container'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.prefix
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/prefix'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.maxConnections
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/maxConnections'
-                        - type: single-step-form
-                          if: showBackendForm|b2
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.bucket
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/bucket'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.prefix
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/prefix'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.maxConnections
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/maxConnections'
-                        - type: single-step-form
-                          if: showBackendForm|gcs
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.bucket
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/bucket'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.prefix
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/prefix'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.maxConnections
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/maxConnections'
-                        - type: single-step-form
-                          if: showBackendForm|local
-                          discriminator:
-                            volumeSource:
-                              type: string
-                          elements:
-                            - type: select
-                              label:
-                                text: labels.repositories.backend.volumeSource
-                              schema:
-                                $ref: 'discriminator#/properties/volumeSource'
-                              options:
-                                - text: Host Path
-                                  value: hostPath
-                                - text: NFS
-                                  value: nfs
-                                - text: Persistant Volume Claim
-                                  value: persistentVolumeClaim
-                              computed: initVolumeSource|/resources/stashAppscodeComRepositoryRepo
-                              onChange: onVolumeSourceChange|/resources/stashAppscodeComRepositoryRepo
-                            - if: showVolumeSourceForm|hostPath
-                              type: single-step-form
-                              label:
-                                text: Host Path form
-                              elements:
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.path
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/path'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.mountPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/mountPath'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.subPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/subPath'
-                            - if: showVolumeSourceForm|nfs
-                              type: single-step-form
-                              label:
-                                text: NFS form
-                              elements:
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.server
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/server'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.path
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/path'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.mountPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/mountPath'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.subPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/subPath'
-                            - if: showVolumeSourceForm|persistentVolumeClaim
-                              type: single-step-form
-                              label:
-                                text: Persistant Volume Claim form
-                              elements:
-                                - type: select
-                                  label:
-                                    text: labels.repositories.backend.pvcName
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/claimName'
-                                  fetch: resourceNames|core|v1|persistentvolumeclaims
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.mountPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/mountPath'
-                                - type: input
-                                  label:
-                                    text: labels.repositories.backend.subPath
-                                  schema:
-                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/subPath'
-                        - type: single-step-form
-                          if: showBackendForm|rest
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.url
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/rest/properties/url'
-                        - type: single-step-form
-                          if: showBackendForm|s3
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.endPoint
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/endpoint'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.bucket
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/bucket'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.prefix
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/prefix'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.region
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/region'
-                        - type: single-step-form
-                          if: showBackendForm|swift
-                          elements:
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.container
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/container'
-                            - type: input
-                              label:
-                                text: labels.repositories.backend.prefix
-                              schema:
-                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/prefix'
-                        - type: select
-                          label:
-                            text: labels.repositories.backend.secret
-                          schema:
-                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/storageSecretName'
-                          fetch: resourceNames|core|v1|secrets
-                - label:
-                    text: labels.backupConfiguration.targetReference.title
-                    hasLine: true
-                    isSubsection: true
-                  type: label-element
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.targetReference.apiVersion
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/apiVersion'
-                  disabled: true
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.targetReference.kind
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/kind'
-                  disabled: true
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.targetReference.name
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/name'
-                  computed: initalizeTargetReferenceName
-                  disabled: true
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.taskName
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/task/properties/name'
-                - label:
-                    text: labels.backupConfiguration.retentionPolicy.title
-                    hasLine: true
-                    isSubsection: true
-                  type: label-element
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.retentionPolicy.name
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/name'
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.retentionPolicy.keepLast
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/keepLast'
-                - type: switch
-                  label:
-                    text: labels.backupConfiguration.retentionPolicy.prune
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/prune'
-                - type: input
-                  label:
-                    text: labels.backupConfiguration.schedule
-                  schema:
-                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/schedule'
-            - if: showInvokerForm|backupBlueprint
-              type: single-step-form
-              label:
-                text: Backup Blueprint form
-              discriminator:
-                backupBlueprintName:
-                  type: string
-                schedule:
-                  type: string
-                taskParameters:
-                  type: object
-                  additionalProperties:
-                    type: string
-              elements:
-                - type: label-element
-                  label:
-                    text: labels.backupBlueprint.title
-                    hasLine: true
-                - type: select
-                  label:
-                    text: labels.backupBlueprint.name
-                  schema:
-                    $ref: 'discriminator#/properties/backupBlueprintName'
-                  computed: initFromAnnotationValue|stash.appscode.com/backup-blueprint
-                  onChange: onBackupBlueprintNameChange
-                  fetch: unNamespacedResourceNames|stash.appscode.com|v1beta1|backupblueprints
-                - type: input
-                  label:
-                    text: labels.backupBlueprint.schedule
-                  schema:
-                    $ref: 'discriminator#/properties/schedule'
-                  computed: initFromAnnotationValue|stash.appscode.com/schedule
-                  onChange: onBackupBlueprintScheduleChange
-                - type: key-value-input-form
-                  label:
-                    text: labels.backupBlueprint.taskParameters
-                  schema:
-                    $ref: 'discriminator#/properties/taskParameters'
-                  keys:
-                    label:
-                      text: Key
-                  values:
-                    type: input
-                    label:
-                      text: Value
-                    schema:
-                      $ref: 'discriminator#/properties/taskParameters/additionalProperties'
-                  isArray: true
-                  computed: initFromAnnotationKeyValue|params.stash.appscode.com/
-                  onChange: onTaskParametersChange
-    id: backupconfiguration
-    title: steps.3.label
-  - form:
-      type: single-step-form
-      discriminator:
         prePopulateDatabase:
           type: string
       elements:
@@ -1657,6 +1227,436 @@ steps:
               schema:
                 $ref: 'schema#/properties/resources/properties/kubedbComMongoDB/properties/spec/properties/init/properties/waitForInitialRestore'
     id: initialization
+    title: steps.3.label
+  - form:
+      type: single-step-form
+      discriminator:
+        scheduleBackup:
+          type: boolean
+      elements:
+        - type: radio
+          label:
+            text: labels.backup.title
+          schema:
+            $ref: 'discriminator#/properties/scheduleBackup'
+          options:
+            - text: options.yesOrNo.yes.text
+              value: 'yes'
+            - text: options.yesOrNo.no.text
+              value: 'no'
+          computed: initScheduleBackup
+          onChange: onScheduleBackupChange
+        - type: single-step-form
+          label:
+            text: Backup Form
+          if: showBackupForm
+          discriminator:
+            backupInvoker:
+              type: string
+          elements:
+            - type: select
+              label:
+                text: labels.backup.invoker
+              schema:
+                $ref: 'discriminator#/properties/backupInvoker'
+              options:
+                - text: Backup Configuration
+                  value: backupConfiguration
+                - text: Backup Blueprint
+                  value: backupBlueprint
+              computed: initBackupInvoker
+              onChange: onBackupInvokerChange
+            - if: showInvokerForm|backupConfiguration
+              type: single-step-form
+              label:
+                text: Backup Configuration form
+              discriminator:
+                targetType:
+                  type: string
+              elements:
+                - type: label-element
+                  label:
+                    text: labels.backupConfiguration.title
+                    hasLine: true
+                - type: input
+                  label:
+                    text: labels.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/name'
+                - disabled: true
+                  type: input
+                  label:
+                    text: labels.namespace
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/metadata/properties/namespace'
+                  computed: initializeNamespace
+                - type: single-step-form
+                  discriminator:
+                    repositoryChoise:
+                      type: string
+                  elements:
+                    - type: label-element
+                      label:
+                        text: labels.repositories.title
+                        hasLine: true
+                        isSubsection: true
+                    - type: radio
+                      schema:
+                        $ref: 'discriminator#/properties/repositoryChoise'
+                      options:
+                        - text: options.createOrSelect.select.text
+                          value: select
+                        - text: options.createOrSelect.create.text
+                          value: create
+                      computed: initRepositoryChoise
+                      onChange: onRepositoryChoiseChange
+                    - if: showRepositorySelectOrCreate|select
+                      type: select
+                      label:
+                        text: labels.repositories.title
+                      schema:
+                        $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/repository/properties/name'
+                      fetch: resourceNames|stash.appscode.com|v1alpha1|repositories
+                    - if: showRepositorySelectOrCreate|create
+                      type: single-step-form
+                      discriminator:
+                        backendType:
+                          type: string
+                      elements:
+                        - type: input
+                          label:
+                            text: labels.repositories.name
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/name'
+                          onChange: onRepositoryNameChange
+                        - disabled: true
+                          type: input
+                          label:
+                            text: labels.namespace
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/metadata/properties/namespace'
+                          computed: initializeNamespace
+                        - type: label-element
+                          label:
+                            text: labels.repositories.backend.title
+                            isSubsection: true
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.type
+                          schema:
+                            $ref: 'discriminator#/properties/backendType'
+                          options:
+                            - text: Azure
+                              value: azure
+                            - text: B2
+                              value: b2
+                            - text: Google Cloud Service
+                              value: gcs
+                            - text: Local
+                              value: local
+                            - text: Rest
+                              value: rest
+                            - text: S3
+                              value: s3
+                            - text: Swift
+                              value: swift
+                          computed: initBackendType|/resources/stashAppscodeComRepositoryRepo
+                          onChange: onBackendTypeChange|/resources/stashAppscodeComRepositoryRepo
+                        - type: single-step-form
+                          if: showBackendForm|azure
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/azure/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|b2
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/b2/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|gcs
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.maxConnections
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/gcs/properties/maxConnections'
+                        - type: single-step-form
+                          if: showBackendForm|local
+                          discriminator:
+                            volumeSource:
+                              type: string
+                          elements:
+                            - type: select
+                              label:
+                                text: labels.repositories.backend.volumeSource
+                              schema:
+                                $ref: 'discriminator#/properties/volumeSource'
+                              options:
+                                - text: Host Path
+                                  value: hostPath
+                                - text: NFS
+                                  value: nfs
+                                - text: Persistant Volume Claim
+                                  value: persistentVolumeClaim
+                              computed: initVolumeSource|/resources/stashAppscodeComRepositoryRepo
+                              onChange: onVolumeSourceChange|/resources/stashAppscodeComRepositoryRepo
+                            - if: showVolumeSourceForm|hostPath
+                              type: single-step-form
+                              label:
+                                text: Host Path form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/hostPath/properties/subPath'
+                            - if: showVolumeSourceForm|nfs
+                              type: single-step-form
+                              label:
+                                text: NFS form
+                              elements:
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.server
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/server'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.path
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/path'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/nfs/properties/subPath'
+                            - if: showVolumeSourceForm|persistentVolumeClaim
+                              type: single-step-form
+                              label:
+                                text: Persistant Volume Claim form
+                              elements:
+                                - type: select
+                                  label:
+                                    text: labels.repositories.backend.pvcName
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/claimName'
+                                  fetch: resourceNames|core|v1|persistentvolumeclaims
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.mountPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/mountPath'
+                                - type: input
+                                  label:
+                                    text: labels.repositories.backend.subPath
+                                  schema:
+                                    $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/local/properties/persistentVolumeClaim/properties/subPath'
+                        - type: single-step-form
+                          if: showBackendForm|rest
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.url
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/rest/properties/url'
+                        - type: single-step-form
+                          if: showBackendForm|s3
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.endPoint
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/endpoint'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.bucket
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/bucket'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/prefix'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.region
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/s3/properties/region'
+                        - type: single-step-form
+                          if: showBackendForm|swift
+                          elements:
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.container
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/container'
+                            - type: input
+                              label:
+                                text: labels.repositories.backend.prefix
+                              schema:
+                                $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/swift/properties/prefix'
+                        - type: select
+                          label:
+                            text: labels.repositories.backend.secret
+                          schema:
+                            $ref: 'schema#/properties/resources/properties/stashAppscodeComRepositoryRepo/properties/spec/properties/backend/properties/storageSecretName'
+                          fetch: resourceNames|core|v1|secrets
+                - label:
+                    text: labels.backupConfiguration.targetReference.title
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.apiVersion
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/apiVersion'
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.kind
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/kind'
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.targetReference.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/target/properties/ref/properties/name'
+                  computed: initalizeTargetReferenceName
+                  disabled: true
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.taskName
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/task/properties/name'
+                - label:
+                    text: labels.backupConfiguration.retentionPolicy.title
+                    hasLine: true
+                    isSubsection: true
+                  type: label-element
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.name
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/name'
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.keepLast
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/keepLast'
+                - type: switch
+                  label:
+                    text: labels.backupConfiguration.retentionPolicy.prune
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/retentionPolicy/properties/prune'
+                - type: input
+                  label:
+                    text: labels.backupConfiguration.schedule
+                  schema:
+                    $ref: 'schema#/properties/resources/properties/stashAppscodeComBackupConfiguration/properties/spec/properties/schedule'
+            - if: showInvokerForm|backupBlueprint
+              type: single-step-form
+              label:
+                text: Backup Blueprint form
+              discriminator:
+                backupBlueprintName:
+                  type: string
+                schedule:
+                  type: string
+                taskParameters:
+                  type: object
+                  additionalProperties:
+                    type: string
+              elements:
+                - type: label-element
+                  label:
+                    text: labels.backupBlueprint.title
+                    hasLine: true
+                - type: select
+                  label:
+                    text: labels.backupBlueprint.name
+                  schema:
+                    $ref: 'discriminator#/properties/backupBlueprintName'
+                  computed: initFromAnnotationValue|stash.appscode.com/backup-blueprint
+                  onChange: onBackupBlueprintNameChange
+                  fetch: unNamespacedResourceNames|stash.appscode.com|v1beta1|backupblueprints
+                - type: input
+                  label:
+                    text: labels.backupBlueprint.schedule
+                  schema:
+                    $ref: 'discriminator#/properties/schedule'
+                  computed: initFromAnnotationValue|stash.appscode.com/schedule
+                  onChange: onBackupBlueprintScheduleChange
+                - type: key-value-input-form
+                  label:
+                    text: labels.backupBlueprint.taskParameters
+                  schema:
+                    $ref: 'discriminator#/properties/taskParameters'
+                  keys:
+                    label:
+                      text: Key
+                  values:
+                    type: input
+                    label:
+                      text: Value
+                    schema:
+                      $ref: 'discriminator#/properties/taskParameters/additionalProperties'
+                  isArray: true
+                  computed: initFromAnnotationKeyValue|params.stash.appscode.com/
+                  onChange: onTaskParametersChange
+    id: backupconfiguration
     title: steps.4.label
   - form:
       elements:
