@@ -1,9 +1,3 @@
-function disableLableChecker({ itemCtx }) {
-  const { key } = itemCtx;
-  if (key.startsWith("app.kubernetes.io")) return true;
-  else return false;
-}
-
 function isEqualToModelPathValue(
   { model, getValue, watchDependency },
   value,
@@ -60,7 +54,11 @@ function showNewSecretCreateField({
   return resp;
 }
 
-function showStorageSizeField({ discriminator, getValue, watchDependency }) {
+function showCommonStorageClassAndSizeField({
+  discriminator,
+  getValue,
+  watchDependency,
+}) {
   watchDependency("discriminator#/activeDatabaseMode");
   const mode = getValue(discriminator, "/activeDatabaseMode");
   const validType = ["Standalone", "Replicaset"];
@@ -221,7 +219,7 @@ function setDatabaseMode({ model, getValue, watchDependency }) {
   const modelPathValue = getValue(model, "/resources/kubedbComMongoDB/spec");
   watchDependency("model#/resources/kubedbComMongoDB/spec");
   if (modelPathValue.shardTopology) return "Sharded";
-  else if (modelPathValue.replicaSet) return "Replicaset";
+  else if (modelPathValue.replicaset) return "Replicaset";
   else return "Standalone";
 }
 
@@ -231,7 +229,7 @@ function deleteDatabaseModePath({ discriminator, getValue, commit, model }) {
   if (mode === "Sharded") {
     commit(
       "wizard/model$delete",
-      "/resources/kubedbComMongoDB/spec/replicaSet"
+      "/resources/kubedbComMongoDB/spec/replicaset"
     );
     commit("wizard/model$delete", "/resources/kubedbComMongoDB/spec/replicas");
 
@@ -271,9 +269,9 @@ function deleteDatabaseModePath({ discriminator, getValue, commit, model }) {
       "/resources/kubedbComMongoDB/spec/shardTopology"
     );
 
-    if (!modelSpec.replicaSet) {
+    if (!modelSpec.replicaset) {
       commit("wizard/model$update", {
-        path: "/resources/kubedbComMongoDB/spec/replicaSet",
+        path: "/resources/kubedbComMongoDB/spec/replicaset",
         value: { name: "" },
         force: true,
       });
@@ -291,7 +289,7 @@ function deleteDatabaseModePath({ discriminator, getValue, commit, model }) {
 
     commit(
       "wizard/model$delete",
-      "/resources/kubedbComMongoDB/spec/replicaSet"
+      "/resources/kubedbComMongoDB/spec/replicaset"
     );
     commit("wizard/model$delete", "/resources/kubedbComMongoDB/spec/replicas");
   }
@@ -1860,12 +1858,11 @@ function isValueExistInModel({ model, getValue }, path) {
 }
 
 return {
-  disableLableChecker,
   isEqualToModelPathValue,
   showAuthPasswordField,
   showAuthSecretField,
   showNewSecretCreateField,
-  showStorageSizeField,
+  showCommonStorageClassAndSizeField,
   setApiGroup,
   setDatabaseMode,
   deleteDatabaseModePath,
