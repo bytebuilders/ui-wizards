@@ -284,10 +284,6 @@ en:
       prometheus_operator:
         description: Inject metric exporter sidecar and creates a ServiceMonitor
         label: Prometheus Operator
-    client_auth_mode:
-      md5: md5
-      scram: scram
-      cert: cert
     configOptions:
       backup:
         description: Schedule periodic backup via Stash.
