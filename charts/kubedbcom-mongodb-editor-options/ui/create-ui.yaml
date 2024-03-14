@@ -25,6 +25,7 @@ steps:
         $ref: schema#/properties/metadata/properties/release/properties/namespace
       type: select
     - fetch: getMongoDbVersions|catalog.kubedb.com|v1alpha1|mongodbversions
+      allowEmpty: false
       label:
         text: labels.database.version
       schema:
